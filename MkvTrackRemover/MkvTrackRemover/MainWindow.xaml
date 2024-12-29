@@ -1,0 +1,53 @@
+<!-- Copyright (c) Microsoft Corporation and Contributors. -->
+<!-- Licensed under the MIT License. -->
+
+<Window
+    x:Class="MkvTrackRemover.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MkvTrackRemover"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:interfaces="using:MkvTrackRemover.interfaces"
+    mc:Ignorable="d"
+    Activated="Window_Activated"
+    >
+
+    <StackPanel>
+        <InfoBar Title="MKV Path"  x:Name="infoBar" Severity="Informational" IsOpen="True"></InfoBar>
+        <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="Directory" />
+                <TextBox x:Name="directoryInput" />
+                <InfoBar x:Name="directoryInputStatus" Severity="Error" IsOpen="False" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel.Resources>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Margin" Value="0,10,0,0" />
+                    </Style>
+                </StackPanel.Resources>
+                <StackPanel Grid.Column="1" Grid.Row="3">
+                    <TextBlock Text="Audio Track" />
+                    <CheckBox x:Name="keepGermanAudioCheckbox" IsChecked="True" Checked="keepAudioCheckbox_Checked" Unchecked="keepAudioCheckbox_Checked" Tag="{x:Bind interfaces:ELanguages.German}">Keep German</CheckBox>
+                    <CheckBox x:Name="keepJapanesenAudioCheckbox" IsChecked="True" Checked="keepAudioCheckbox_Checked" Unchecked="keepAudioCheckbox_Checked" Tag="{x:Bind interfaces:ELanguages.Japanese}" >
+                        Keep Japanese
+                    </CheckBox>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Grid.Row="2">
+                    <TextBlock Text="Subtitle Track" />
+                    <CheckBox x:Name="keepGermanSubtitleCheckbox" IsChecked="True" Checked="keepSubtitleCheckbox_Checked" Unchecked="keepSubtitleCheckbox_Checked" Tag="{x:Bind interfaces:ELanguages.German}">Keep German</CheckBox>
+                </StackPanel>
+            </StackPanel>
+            <Button x:Name="runButton" Click="run_Click" HorizontalAlignment="Center">Run</Button>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <ProgressRing x:Name="progressCircle" Visibility="Collapsed"/>
+                <ProgressBar x:Name="progressBar"></ProgressBar>
+            </StackPanel>
+            <TextBlock Text="Output:" />
+            <ScrollViewer Width="Auto" Height="100" VerticalScrollBarVisibility="Visible" VerticalScrollMode="Enabled">
+                <RichTextBlock x:Name="outputTextBox" ScrollViewer.VerticalScrollBarVisibility="Visible" />
+            </ScrollViewer>
+        </StackPanel>
+    </StackPanel>
+</Window>
