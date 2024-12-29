@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Core;
@@ -45,6 +46,17 @@ namespace MkvTrackRemover
             {
                 fe.Loaded += (ss, ee) => InitWithXamlRoot();
             }
+            ConsumeArgs();
+        }
+
+        private void ConsumeArgs()
+        {
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Length > 1)
+            {
+                directoryInput.Text = args[1];
+            }
+            
         }
 
         private void InitWithXamlRoot()

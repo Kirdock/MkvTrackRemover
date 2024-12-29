@@ -10,7 +10,11 @@
     <UseWinUI>true</UseWinUI>
 	<Nullable>enable</Nullable>
 	<Version>$(VersionPrefix)</Version>
+	<ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="icon.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.WinUI" Version="7.1.2" />
