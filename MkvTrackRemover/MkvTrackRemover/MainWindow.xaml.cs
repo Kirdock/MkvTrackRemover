@@ -1,29 +1,15 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using CommunityToolkit.WinUI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Documents;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using MkvTrackRemover.helpers;
-using MkvTrackRemover.interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Microsoft.UI.Dispatching;
-using Windows.UI.Core;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -64,7 +50,7 @@ namespace MkvTrackRemover
         private void OnLoaded()
         {
             MessageHelper = new MessageHelper(DispatcherQueue, Content.XamlRoot);
-            MkvExecutor = new MkvExecutor(StartProgressBar, UpdateProgressBar, UpdateOutput, MessageHelper );
+            MkvExecutor = new MkvExecutor(StartProgressBar, UpdateProgressBar, UpdateOutput, MessageHelper);
             MkvLocator.SetMvkDirectory();
             infoBar.Message = MkvLocator.MkvDirectory;
             InitDefaultValues();
@@ -73,7 +59,7 @@ namespace MkvTrackRemover
         private void InitDefaultValues()
         {
             CheckBox[] audioCheckboxes = new CheckBox[] { keepGermanAudioCheckbox, keepJapanesenAudioCheckbox };
-            CheckBox[] subtitleCheckboxes = new CheckBox[] { keepGermanSubtitleCheckbox};
+            CheckBox[] subtitleCheckboxes = new CheckBox[] { keepGermanSubtitleCheckbox, keepUndeterminedSubtitleCheckbox };
 
             foreach(var audioCheckbox in audioCheckboxes)
             {

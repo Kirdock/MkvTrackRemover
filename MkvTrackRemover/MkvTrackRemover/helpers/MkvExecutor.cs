@@ -98,7 +98,7 @@ namespace MkvTrackRemover.helpers
 
         private async Task<string> ExecuteCommand(string command, bool writeAsync = false)
         {
-            System.Diagnostics.Process process = new System.Diagnostics.Process
+            using (System.Diagnostics.Process process = new System.Diagnostics.Process
             {
                 StartInfo = new System.Diagnostics.ProcessStartInfo
                 {
@@ -110,24 +110,25 @@ namespace MkvTrackRemover.helpers
                     Arguments = command,
                     StandardOutputEncoding = Encoding.UTF8,
                 },
-            };
-            
-            process.Start();
-            StringBuilder output = new StringBuilder();
-            while (!process.StandardOutput.EndOfStream)
+            })
             {
-                string? line = await process.StandardOutput.ReadLineAsync();
-                if (line != null)
+                process.Start();
+                StringBuilder output = new();
+                while (!process.StandardOutput.EndOfStream)
                 {
-                    if(writeAsync)
+                    string? line = await process.StandardOutput.ReadLineAsync();
+                    if (line != null)
                     {
-                        UpdateOutput(line);
+                        if (writeAsync)
+                        {
+                            UpdateOutput(line);
+                        }
+                        output.AppendLine(line);
                     }
-                    output.AppendLine(line);
                 }
+                process.WaitForExit();
+                return output.ToString();
             }
-            process.WaitForExit();
-            return output.ToString();
         }
     }
 }

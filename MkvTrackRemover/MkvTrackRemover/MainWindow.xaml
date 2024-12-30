@@ -28,14 +28,21 @@
                 </StackPanel.Resources>
                 <StackPanel Grid.Column="1" Grid.Row="3">
                     <TextBlock Text="Audio Track" />
-                    <CheckBox x:Name="keepGermanAudioCheckbox" IsChecked="True" Checked="keepAudioCheckbox_Checked" Unchecked="keepAudioCheckbox_Checked" Tag="{x:Bind interfaces:ELanguages.German}">Keep German</CheckBox>
+                    <CheckBox x:Name="keepGermanAudioCheckbox" IsChecked="True" Checked="keepAudioCheckbox_Checked" Unchecked="keepAudioCheckbox_Checked" Tag="{x:Bind interfaces:ELanguages.German}">
+                        Keep German
+                    </CheckBox>
                     <CheckBox x:Name="keepJapanesenAudioCheckbox" IsChecked="True" Checked="keepAudioCheckbox_Checked" Unchecked="keepAudioCheckbox_Checked" Tag="{x:Bind interfaces:ELanguages.Japanese}" >
                         Keep Japanese
                     </CheckBox>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Grid.Row="2">
                     <TextBlock Text="Subtitle Track" />
-                    <CheckBox x:Name="keepGermanSubtitleCheckbox" IsChecked="True" Checked="keepSubtitleCheckbox_Checked" Unchecked="keepSubtitleCheckbox_Checked" Tag="{x:Bind interfaces:ELanguages.German}">Keep German</CheckBox>
+                    <CheckBox x:Name="keepGermanSubtitleCheckbox" IsChecked="True" Checked="keepSubtitleCheckbox_Checked" Unchecked="keepSubtitleCheckbox_Checked" Tag="{x:Bind interfaces:ELanguages.German}">
+                        Keep German
+                    </CheckBox>
+                    <CheckBox x:Name="keepUndeterminedSubtitleCheckbox" IsChecked="True" Checked="keepSubtitleCheckbox_Checked" Unchecked="keepSubtitleCheckbox_Checked" Tag="{x:Bind interfaces:ELanguages.Undetermined}">
+                        Keep Undetermined
+                    </CheckBox>
                 </StackPanel>
             </StackPanel>
             <Button x:Name="runButton" Click="run_Click" HorizontalAlignment="Center">Run</Button>
