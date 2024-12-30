@@ -10,7 +10,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:interfaces="using:MkvTrackRemover.interfaces"
     mc:Ignorable="d"
-    Activated="Window_Activated"
     >
 
     <StackPanel>
@@ -40,9 +39,8 @@
                 </StackPanel>
             </StackPanel>
             <Button x:Name="runButton" Click="run_Click" HorizontalAlignment="Center">Run</Button>
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                <ProgressRing x:Name="progressCircle" Visibility="Collapsed"/>
-                <ProgressBar x:Name="progressBar"></ProgressBar>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                <ProgressBar x:Name="progressBar" Margin="0 30" Width="250"></ProgressBar>
             </StackPanel>
             <TextBlock Text="Output:" />
             <ScrollViewer Width="Auto" Height="100" VerticalScrollBarVisibility="Visible" VerticalScrollMode="Enabled">

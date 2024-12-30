@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
@@ -18,14 +20,16 @@ namespace MkvTrackRemover.helpers
     internal class MkvExecutor
     {
         private readonly Action<int> StartProgressBar;
-        private readonly Action<string> UpdateProgressBar;
+        private readonly Action UpdateProgressBar;
+        private readonly Action<string> UpdateOutput;
         private readonly MessageHelper MessageHelper;
 
-        public MkvExecutor(Action<int> startProgressBar, Action<string> updateProgressBar, DispatcherQueue dispatcherQueue, XamlRoot xamlRoot)
+        public MkvExecutor(Action<int> startProgressBar, Action updateProgressBar, Action<string> updateOutput, MessageHelper messageHelper)
         {
             UpdateProgressBar = updateProgressBar;
             StartProgressBar = startProgressBar;
-            MessageHelper = new MessageHelper(dispatcherQueue, xamlRoot);
+            MessageHelper = messageHelper;
+            UpdateOutput = updateOutput;
         }
 
         internal async Task Execute(string directory, HashSet<string> audioConfig, HashSet<string> subtitleConfig)
@@ -37,9 +41,8 @@ namespace MkvTrackRemover.helpers
                 bool skipDialog = false;
                 foreach (string fileName in fileNames)
                 {
-                    string output = ExecuteCommand($"-J \"{fileName}\"");
+                    string output = await ExecuteCommand($"-J \"{fileName}\"");
                     IMkvInfo? info = JsonSerializer.Deserialize<IMkvInfo>(output);
-                    string mergeOutput = string.Empty;
                     if(info != null)
                     {
                         HashSet<int> keepAudioTracks = new();
@@ -61,7 +64,7 @@ namespace MkvTrackRemover.helpers
                                 }
                             }
                         }
-                        if(!skipDialog && (keepSubtitleTracks.Count == 0 || keepAudioTracks.Count == 0))
+                        if (!skipDialog && (keepSubtitleTracks.Count == 0 || keepAudioTracks.Count == 0))
                         {
                             ContentDialogResult result = await MessageHelper.ShowYesNo($"Subtitle or audio track for file \"{fileName}\" is empty!\nContinue?");
                             if(result != ContentDialogResult.Primary) {
@@ -69,9 +72,9 @@ namespace MkvTrackRemover.helpers
                             }
                             skipDialog = true;
                         }
-                        mergeOutput = KeepTracks(fileName, keepAudioTracks, keepSubtitleTracks);
+                        await KeepTracks(fileName, keepAudioTracks, keepSubtitleTracks);
                     }
-                    UpdateProgressBar(mergeOutput);
+                    UpdateProgressBar();
                 }
             }
             catch (Exception ex)
@@ -80,7 +83,7 @@ namespace MkvTrackRemover.helpers
             }
         }
 
-        private string KeepTracks(string fileName, HashSet<int> audioTracks, HashSet<int> subtitleTracks)
+        private async Task<string> KeepTracks(string fileName, HashSet<int> audioTracks, HashSet<int> subtitleTracks)
         {
             string? directory = Path.GetDirectoryName(fileName);
             if (directory == null)
@@ -90,10 +93,10 @@ namespace MkvTrackRemover.helpers
             string destination = Path.Combine(directory, "remuxed", Path.GetFileName(fileName));
             string subtitleString = subtitleTracks.Count == 0 ? "--no-subtitles" : $"--subtitle-tracks {string.Join(",", subtitleTracks)}";
             string audioTrackString = $"--audio-tracks {string.Join(",", audioTracks)}";
-            return ExecuteCommand($" -o \"{destination}\" {audioTrackString} {subtitleString} \"{fileName}\"");
+            return await ExecuteCommand($" -o \"{destination}\" {audioTrackString} {subtitleString} \"{fileName}\"", true);
         }
 
-        private string ExecuteCommand(string command)
+        private async Task<string> ExecuteCommand(string command, bool writeAsync = false)
         {
             System.Diagnostics.Process process = new System.Diagnostics.Process
             {
@@ -110,9 +113,21 @@ namespace MkvTrackRemover.helpers
             };
             
             process.Start();
-            string output = process.StandardOutput.ReadToEnd();
+            StringBuilder output = new StringBuilder();
+            while (!process.StandardOutput.EndOfStream)
+            {
+                string? line = await process.StandardOutput.ReadLineAsync();
+                if (line != null)
+                {
+                    if(writeAsync)
+                    {
+                        UpdateOutput(line);
+                    }
+                    output.AppendLine(line);
+                }
+            }
             process.WaitForExit();
-            return output;
+            return output.ToString();
         }
     }
 }

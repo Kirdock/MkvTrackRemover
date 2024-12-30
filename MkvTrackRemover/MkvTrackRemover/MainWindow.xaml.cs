@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Microsoft.UI.Dispatching;
 using Windows.UI.Core;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -37,6 +38,7 @@ namespace MkvTrackRemover
         private readonly HashSet<string> SelectedAudioTracks = new();
         private readonly HashSet<string> SelectedSubtitleTracks = new();
         private MkvExecutor MkvExecutor;
+        private MessageHelper MessageHelper;
         private readonly DispatcherQueue DispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
         public MainWindow()
@@ -44,7 +46,7 @@ namespace MkvTrackRemover
             this.InitializeComponent();
             if (Content is FrameworkElement fe)
             {
-                fe.Loaded += (ss, ee) => InitWithXamlRoot();
+                fe.Loaded += (ss, ee) => OnLoaded();
             }
             ConsumeArgs();
         }
@@ -59,13 +61,10 @@ namespace MkvTrackRemover
             
         }
 
-        private void InitWithXamlRoot()
+        private void OnLoaded()
         {
-            MkvExecutor = new MkvExecutor(StartProgressBar, UpdateProgressBar, DispatcherQueue, Content.XamlRoot);
-        }
-
-        private void Window_Activated(object sender, Microsoft.UI.Xaml.WindowActivatedEventArgs args)
-        {
+            MessageHelper = new MessageHelper(DispatcherQueue, Content.XamlRoot);
+            MkvExecutor = new MkvExecutor(StartProgressBar, UpdateProgressBar, UpdateOutput, MessageHelper );
             MkvLocator.SetMvkDirectory();
             infoBar.Message = MkvLocator.MkvDirectory;
             InitDefaultValues();
@@ -105,21 +104,23 @@ namespace MkvTrackRemover
         {
             DispatcherQueue.TryEnqueue(() =>
             {
-                progressCircle.Visibility = Visibility.Visible;
                 progressBar.Maximum = maximum;
                 progressBar.Value = 0;
             });
         }
 
-        internal void UpdateProgressBar(string message)
+        internal void UpdateProgressBar()
         {
             DispatcherQueue.TryEnqueue(() =>
             {
                 progressBar.Value++;
-                if(progressBar.Value == progressBar.Maximum)
-                {
-                    progressCircle.Visibility = Visibility.Collapsed;
-                }
+            });
+        }
+
+        internal void UpdateOutput(string message)
+        {
+            DispatcherQueue.TryEnqueue(() =>
+            {
                 AddOutputLine(message);
             });
         }
@@ -134,6 +135,7 @@ namespace MkvTrackRemover
 
             paragraph.Inlines.Add(run);
             outputTextBox.Blocks.Add(paragraph);
+
         }
 
         private void HandleTrack(object sender, HashSet<string> selectedLanguages)
